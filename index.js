@@ -10,7 +10,6 @@ const nombreBot = "Nagi Seishiro Sub-Bot";
 async function conectarSubBot(numero, res = null) {
     const carpetaSesion = `./sesiones/sesion_${numero}`;
     
-    // Si piden un código nuevo desde la web, borra intentos viejos fallidos
     if (res && fs.existsSync(carpetaSesion)) {
         fs.rmSync(carpetaSesion, { recursive: true, force: true });
     }
@@ -22,7 +21,6 @@ async function conectarSubBot(numero, res = null) {
         version,
         logger: pino({ level: 'silent' }),
         auth: state,
-        // 👇 ESTO ES CLAVE PARA QUE WHATSAPP ACEPTE EL CÓDIGO DE 8 DÍGITOS
         browser: Browsers.ubuntu('Chrome'),
         printQRInTerminal: false,
         syncFullHistory: false
@@ -61,12 +59,15 @@ async function conectarSubBot(numero, res = null) {
         }
     });
 
-    sock.ev.on('messages.upsert', async ({ messages }) => {
+    sock.ev.on('messages.upsert', async ({ messages, type }) => {
+        if (type !== 'notify') return;
         const msg = messages[0];
-        if (!msg || !msg.message || msg.key.fromMe) return;
+        if (!msg || !msg.message) return;
 
         const remitente = msg.key.remoteJid;
-        const texto = msg.message.conversation || msg.message.extendedTextMessage?.text || "";
+        const texto = msg.message.conversation || 
+                      msg.message.extendedTextMessage?.text || 
+                      msg.message.imageMessage?.caption || "";
         const comando = texto.toLowerCase().trim();
 
         if (comando === '.menu') {
