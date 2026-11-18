@@ -1,4 +1,3 @@
-
 const {
   default: makeWASocket,
   useMultiFileAuthState,
@@ -7,10 +6,14 @@ const {
   Browsers
 } = await import("@whiskeysockets/baileys");
 
-import express from "express"
-import pino from "pino"
-import fs from "fs"
+import express from "express";
+import pino from "pino";
+import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
@@ -193,9 +196,21 @@ async function conectar(numero, res = null) {
     });
 
     if (!sock.authState.creds.registered && res) {
-      const code = await sock.requestPairingCode(numero);
-      pairingCode = code.match(/.{1,4}/g).join("-");
-      res.json({ code: pairingCode });
+      setTimeout(async () => {
+        try {
+          const code = await sock.requestPairingCode(numero);
+          pairingCode = code.match(/.{1,4}/g).join("-");
+          if (!res.headersSent) {
+            res.json({ code: pairingCode });
+          }
+        } catch (err) {
+          connecting = false;
+          console.error("Error pidiendo código:", err);
+          if (!res.headersSent) {
+            res.status(500).json({ error: "Error al generar código. Probá de nuevo." });
+          }
+        }
+      }, 3000);
     }
 
     sock.ev.on("creds.update", saveCreds);
@@ -344,168 +359,15 @@ async function conectar(numero, res = null) {
               break;
 
             case "amistad":
-              await reply("⚽ ¡La amistad también es un gran equipo!");
-              break;
-
-            case "admins":
-              if (!isGroup) {
-                await reply("Este comando solo funciona en grupos.");
-                break;
-              }
-              await reply("♡ Administradores:\n" + admins.map(a => "• @" + a.split("@")[0]).join("\n"));
-              break;
-
-            case "tagall":
-            case "hidetag": {
-              if (!isGroup) {
-                await reply("Solo funciona en grupos.");
-                break;
-              }
-              if (!isAdmin && !isOwner) {
-                await reply("Solo los administradores pueden usarlo.");
-                break;
-              }
-              const mentions = metadata.participants.map(p => p.id);
-              await sock.sendMessage(chat, {
-                text: args.join(" ") || "⚽ ¡Atención a todos!",
-                mentions
-              });
-              break;
-            }
-
-            case "kick":
-            case "promote":
-            case "demote": {
-              if (!isGroup) {
-                await reply("Solo funciona en grupos.");
-                break;
-              }
-              if (!isAdmin && !isOwner) {
-                await reply("Necesitás ser administrador.");
-                break;
-              }
-              if (!botAdmin) {
-                await reply("Necesito ser administrador del grupo.");
-                break;
-              }
-              if (!target) {
-                await reply("Mencioná o respondé al mensaje de la persona.");
-                break;
-              }
-
-              const action = {
-                kick: "remove",
-                promote: "promote",
-                demote: "demote"
-              }[command];
-
-              await sock.groupParticipantsUpdate(chat, [target], action);
-              await reply("♡ Acción realizada correctamente.");
-              break;
-            }
-
-            case "delete": {
-              if (!isGroup || (!isAdmin && !isOwner)) {
-                await reply("Solo los administradores pueden usarlo.");
-                break;
-              }
-              if (!botAdmin) {
-                await reply("Necesito ser administrador.");
-                break;
-              }
-              const context = msg.message.extendedTextMessage?.contextInfo;
-              if (!context?.stanzaId || !context?.participant) {
-                await reply("Respondé al mensaje que querés eliminar.");
-                break;
-              }
-              await sock.sendMessage(chat, {
-                delete: {
-                  remoteJid: chat,
-                  fromMe: false,
-                  id: context.stanzaId,
-                  participant: context.participant
-                }
-              });
-              break;
-            }
-
-            default:
-              break;
-          }
-        } catch (error) {
-          console.error("Error procesando comando:", error);
-        }
-      }
-    });
-
-  } catch (error) {
-    connecting = false;
-    console.error("Error de conexión:", error);
-    if (res && !res.headersSent) {
-      res.status(500).json({ error: "No se pudo conectar. Intentá nuevamente." });
-    }
-  }
-}
-
-app.get("/", (req, res) => {
-  res.send(`
-  <!DOCTYPE html>
-  <html lang="es">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nagi Seishiro Bot</title>
-  <style>
-    body { background:#0b0b12; color:white; font-family:sans-serif;
-      display:flex; justify-content:center; align-items:center;
-      min-height:90vh; }
-    .card { background:#191526; padding:28px; border-radius:18px;
-      width:85%; max-width:360px; text-align:center; }
-    input,button { width:100%; padding:13px; margin-top:12px;
-      box-sizing:border-box; border-radius:9px; border:0; }
-    input { background:#292337; color:white; }
-    button { background:#c7a8ed; color:#171020; font-weight:bold; }
-    #result { font-size:25px; margin-top:20px; }
-  </style>
-  <div class="card">
-    <h2>ᕬ ᕬ NAGI SEISHIRO</h2>
-    <p>♡ Vinculá tu WhatsApp con código</p>
-    <input id="number" placeholder="Número con código de país">
-    <button onclick="generate()">Generar código</button>
-    <div id="result"></div>
-    <p>♡ Nagi Bot 2026</p>
-  </div>
-  <script>
-    async function generate() {
-      const number = document.getElementById("number").value.replace(/\\D/g,"");
-      const result = document.getElementById("result");
-      result.innerText = "Generando...";
-      try {
-        const response = await fetch("/generar", {
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({numero:number})
-        });
-        const data = await response.json();
-        result.innerText = data.code || data.error;
-      } catch(e) {
-        result.innerText = "Error de conexión.";
-      }
-    }
-  </script>
-  </html>
-  `);
+width:100%; padding:13px; margin-top:12px; box-sizing:border-box; border-radius:9px; border:0; } input { background:#292337; color:white; } button { background:#c7a8ed; color:#171020; font-weight:bold; } #result { font-size:25px; margin-top:20px; } </style> <div class="card"> <h2>ᕬ ᕬ NAGI SEISHIRO</h2> <p>♡ Vinculá tu WhatsApp con código</p> <input id="number" placeholder="Número con código de país"> <button onclick="generate()">Generar código</button> <div id="result"></div> <p>♡ Nagi Bot 2026</p> </div> <script> async function generate() { const number = document.getElementById("number").value.replace(/\\D/g,""); const result = document.getElementById("result"); result.innerText = "Generando..."; try { const response = await fetch("/generar", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({numero:number}) }); const data = await response.json(); result.innerText = data.code || data.error; } catch(e) { result.innerText = "Error de conexión."; } } </script> </html>);
 });
-
 app.post("/generar", async (req, res) => {
-  const numero = String(req.body.numero || "").replace(/\D/g, "");
-
-  if (numero.length < 8 || numero.length > 15) {
-    return res.status(400).json({ error: "Número inválido. Incluí el código de país." });
-  }
-
-  await conectar(numero, res);
+const numero = String(req.body.numero || "").replace(/\D/g, "");
+if (numero.length < 8 || numero.length > 15) {
+return res.status(400).json({ error: "Número inválido. Incluí el código de país." });
+}
+await conectar(numero, res);
 });
-
 app.listen(PORT, () => {
-  console.log(`Nagi Bot activo en el puerto ${PORT}`);
+console.log(Nagi Bot activo en el puerto ${PORT});
 });
