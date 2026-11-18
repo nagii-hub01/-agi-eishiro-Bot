@@ -359,15 +359,3 @@ async function conectar(numero, res = null) {
               break;
 
             case "amistad":
-width:100%; padding:13px; margin-top:12px; box-sizing:border-box; border-radius:9px; border:0; } input { background:#292337; color:white; } button { background:#c7a8ed; color:#171020; font-weight:bold; } #result { font-size:25px; margin-top:20px; } </style> <div class="card"> <h2>ᕬ ᕬ NAGI SEISHIRO</h2> <p>♡ Vinculá tu WhatsApp con código</p> <input id="number" placeholder="Número con código de país"> <button onclick="generate()">Generar código</button> <div id="result"></div> <p>♡ Nagi Bot 2026</p> </div> <script> async function generate() { const number = document.getElementById("number").value.replace(/\\D/g,""); const result = document.getElementById("result"); result.innerText = "Generando..."; try { const response = await fetch("/generar", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({numero:number}) }); const data = await response.json(); result.innerText = data.code || data.error; } catch(e) { result.innerText = "Error de conexión."; } } </script> </html>);
-});
-app.post("/generar", async (req, res) => {
-const numero = String(req.body.numero || "").replace(/\D/g, "");
-if (numero.length < 8 || numero.length > 15) {
-return res.status(400).json({ error: "Número inválido. Incluí el código de país." });
-}
-await conectar(numero, res);
-});
-app.listen(PORT, () => {
-console.log(Nagi Bot activo en el puerto ${PORT});
-});
