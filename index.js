@@ -359,3 +359,23 @@ async function conectar(numero, res = null) {
               break;
 
             case "amistad":
+connecting = false;
+console.error("Error de conexión:", error);
+if (res && !res.headersSent) {
+res.status(500).json({ error: "No se pudo conectar. Intentá nuevamente." });
+}
+}
+}
+app.get("/", (req, res) => {
+res.send(<!DOCTYPE html> <html lang="es"> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>Nagi Seishiro Bot</title> <style> body { background:#0b0b12; color:white; font-family:sans-serif; display:flex; justify-content:center; align-items:center; min-height:90vh; } .card { background:#191526; padding:28px; border-radius:18px; width:85%; max-width:360px; text-align:center; } input,button { width:100%; padding:13px; margin-top:12px; box-sizing:border-box; border-radius:9px; border:0; } input { background:#292337; color:white; } button { background:#c7a8ed; color:#171020; font-weight:bold; } #result { font-size:25px; margin-top:20px; } </style> <div class="card"> <h2>ᕬ ᕬ NAGI SEISHIRO</h2> <p>♡ Vinculá tu WhatsApp con código</p> <input id="number" placeholder="Número con código de país"> <button onclick="generate()">Generar código</button> <div id="result"></div> <p>♡ Nagi Bot 2026</p> </div> <script> async function generate() { const number = document.getElementById("number").value.replace(/\\D/g,""); const result = document.getElementById("result"); result.innerText = "Generando..."; try { const response = await fetch("/generar", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({numero:number}) }); const data = await response.json(); result.innerText = data.code || data.error; } catch(e) { result.innerText = "Error de conexión."; } } </script> </html>);
+});
+app.post("/generar", async (req, res) => {
+const numero = String(req.body.numero || "").replace(/\D/g, "");
+if (numero.length < 8 || numero.length > 15) {
+return res.status(400).json({ error: "Número inválido. Incluí el código de país." });
+}
+await conectar(numero, res);
+});
+app.listen(PORT, () => {
+console.log(Nagi Bot activo en el puerto ${PORT});
+});
