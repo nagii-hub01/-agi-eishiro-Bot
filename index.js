@@ -7,7 +7,7 @@ const {
   Browsers
 } = await import("@whiskeysockets/baileys");
 
-const express = require("express");
+import express from "express"
 const pino = require("pino");
 const fs = require("fs");
 const path = require("path");
