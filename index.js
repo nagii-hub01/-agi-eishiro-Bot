@@ -8,9 +8,9 @@ const {
 } = await import("@whiskeysockets/baileys");
 
 import express from "express"
-const pino = require("pino");
-const fs = require("fs");
-const path = require("path");
+import pino from "pino"
+import fs from "fs"
+import path from "path";
 
 const app = express();
 app.use(express.json());
