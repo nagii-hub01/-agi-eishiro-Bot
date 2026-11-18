@@ -1,4 +1,4 @@
-const { default: makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion, Browsers, DisconnectReason } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const express = require('express');
 const fs = require('fs');
@@ -7,9 +7,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const nombreBot = "Nagi Seishiro Sub-Bot";
 
-// Función para iniciar una sesión de Sub-Bot por cada número
 async function conectarSubBot(numero, res = null) {
     const carpetaSesion = `./sesiones/sesion_${numero}`;
+    
+    // Si piden un código nuevo desde la web, borra intentos viejos fallidos
+    if (res && fs.existsSync(carpetaSesion)) {
+        fs.rmSync(carpetaSesion, { recursive: true, force: true });
+    }
+
     const { state, saveCreds } = await useMultiFileAuthState(carpetaSesion);
     const { version } = await fetchLatestBaileysVersion();
 
@@ -17,35 +22,45 @@ async function conectarSubBot(numero, res = null) {
         version,
         logger: pino({ level: 'silent' }),
         auth: state,
-        browser: [nombreBot, "Chrome", "1.0.0"]
+        // 👇 ESTO ES CLAVE PARA QUE WHATSAPP ACEPTE EL CÓDIGO DE 8 DÍGITOS
+        browser: Browsers.ubuntu('Chrome'),
+        printQRInTerminal: false,
+        syncFullHistory: false
     });
 
-    // Generar el código de 8 dígitos y enviarlo a la página web
+    let codigoEnviado = false;
+
     if (!sock.authState.creds.registered && res) {
         setTimeout(async () => {
+            if (codigoEnviado) return;
             try {
                 let codigo = await sock.requestPairingCode(numero);
                 codigo = codigo?.match(/.{1,4}/g)?.join("-") || codigo;
+                codigoEnviado = true;
                 res.json({ codigo });
             } catch (err) {
-                res.status(500).json({ error: "Error al generar código. Verifica el número." });
+                if (!codigoEnviado) {
+                    codigoEnviado = true;
+                    res.status(500).json({ error: "Error al generar código. Intenta de nuevo." });
+                }
             }
-        }, 3000);
+        }, 4000);
     }
 
     sock.ev.on('creds.update', saveCreds);
 
     sock.ev.on('connection.update', (update) => {
-        const { connection } = update;
+        const { connection, lastDisconnect } = update;
         if (connection === 'open') {
-            console.log(`✅ Sub-Bot conectado: ${numero}`);
+            console.log(`✅ Sub-Bot conectado con éxito: ${numero}`);
         } else if (connection === 'close') {
-            console.log(`🔄 Reconectando Sub-Bot: ${numero}`);
-            conectarSubBot(numero);
+            const motivo = lastDisconnect?.error?.output?.statusCode;
+            if (motivo !== DisconnectReason.loggedOut) {
+                conectarSubBot(numero);
+            }
         }
     });
 
-    // Comandos que tendrá cada Sub-Bot conectado
     sock.ev.on('messages.upsert', async ({ messages }) => {
         const msg = messages[0];
         if (!msg || !msg.message || msg.key.fromMe) return;
@@ -69,16 +84,14 @@ async function conectarSubBot(numero, res = null) {
     });
 }
 
-// Ruta que genera el código cuando tocan el botón en la web
 app.get('/generar', async (req, res) => {
     const numero = req.query.numero?.replace(/[^0-9]/g, '');
     if (!numero || numero.length < 10) {
-        return res.status(400).json({ error: "Escribe un número válido con código de país (ej: 5492610000000)." });
+        return res.status(400).json({ error: "Escribe un número válido con código de país (ej: 5492604000000)." });
     }
     await conectarSubBot(numero, res);
 });
 
-// Interfaz visual de la página web (estilo Cosmic)
 app.get('/', (req, res) => {
     res.send(`
     <!DOCTYPE html>
@@ -102,7 +115,7 @@ app.get('/', (req, res) => {
         <div class="card">
             <h2>🌌 ${nombreBot}</h2>
             <p>Escribe tu número de WhatsApp con código de país (sin el +) para generar tu código de vinculación.</p>
-            <input type="text" id="numero" placeholder="Ej: 5492610000000">
+            <input type="text" id="numero" placeholder="Ej: 5492604000000">
             <button onclick="pedirCodigo()">Generar código</button>
             <div id="resultado"></div>
         </div>
@@ -111,7 +124,7 @@ app.get('/', (req, res) => {
                 const num = document.getElementById('numero').value;
                 const resDiv = document.getElementById('resultado');
                 resDiv.style.fontSize = "15px";
-                resDiv.innerText = "Generando código, espera 3 segundos...";
+                resDiv.innerText = "Generando código, espera 4 segundos...";
                 try {
                     const req = await fetch('/generar?numero=' + num);
                     const data = await req.json();
