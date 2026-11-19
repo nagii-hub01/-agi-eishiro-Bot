@@ -39,36 +39,119 @@ function runtime() {
 }
 
 function menu() {
-  return `ᕬ  ᕬㅤㅤ𝐍𝐀𝐆𝐈 ੭୧
-⚽ 𝐒𝐄𝐈𝐒𝐇𝐈𝐑𝐎 𝐁𝐎𝐓 🎮
+  return `ᕬ  ᕬㅤㅤ𝐍𝐀𝐆𝐈   ੭୧   ᮫
+⚙️︪੭    𝐒𝐄𝐈𝐒𝐇𝐈𝐑𝐎 ㅤㅤ  ꔫㅤ
 
-❨ ⚽ ❩ 𝐌𝐀𝐈𝐍 𝐌𝐄𝐍𝐔
-• !menu
-• !help
-• !ping
-• !owner
-• !botinfo
-• !runtime
-• !speed
+❨ ⚽ ❩   𓂂𓂂 𝐌⵿𝖠𝖨𝖭  𝐌𝖤࠘𝖭𝖴 𑊑ㅤׁ🎮ᩨ
+•      — ﹫  !menú
+•      — ﹫  !owner
+•      — ﹫  !ping
+•      — ﹫  !botinfo
+•      — ﹫  !help
+•      — ﹫  !allmenu
+•      — ﹫  !runtime
+•      — ﹫  !script
+•      — ﹫  !speed
+•      — ﹫  !report
 
-❨ 🎮 ❩ 𝐆𝐀𝐌𝐄𝐒
-• !ppt piedra/papel/tijera
-• !dado
-• !moneda
-• !8ball
-• !ship
-• !quiz
+❨ 🎮 ❩   𓂂𓂂 𝖲𝖳࠘𝖨𝖢𝖪⵿𝖤𝖱𝖲 𝖸 𝖨⵿𝖬𝖠𝖦࠘𝖤𝖭𝖤𝖲 𑊑ㅤׁ⚽ᩨ
+•      — ﹫  !sticker
+•      — ﹫  !s
+•      — ﹫  !toimg
+•      — ﹫  !take
+•      — ﹫  !emojimix
+•      — ﹫  !qc
+•      — ﹫  !wanted
+•      — ﹫  !blur
+•      — ﹫  !circle
+•      — ﹫  !trigger
 
-❨ ⚽ ❩ 𝐅𝐔𝐍
-• !frase
-• !chiste
-• !love
-• !amistad
-• !abrazo
-• !report
+❨ ⚽ ❩   𓂂𓂂  𝐆𝖱𝖮⵿𝖴𝖯 𝐆𝖠𝖬࠘𝖤𝖲 𑊑ㅤׁ🎮ᩨ
+•      — ﹫  !ppt
+•      — ﹫  !trivia
+•      — ﹫  !adivina
+•      — ﹫  !verdad
+•      — ﹫  !reto
+•      — ﹫  !quiz
+•      — ﹫  !riddle
+•      — ﹫  !adivinanza
+•      — ﹫  !numeros
+•      — ﹫  !memoria
 
-ㅤㅤ𓂂𓂂 𝐍𝐀𝐆𝐈 𝐒𝐄𝐈𝐒𝐇𝐈𝐑𝐎
-ㅤㅤㅤㅤ𖹭 𝐁𝐎𝐓 𖹭`;
+❨ 🎮 ❩   𓂂𓂂  𝐒⵿𝖮𝖢𝖨࠘𝖠𝖫 𑊑ㅤׁ⚽ᩨ
+•      — ﹫  !perfil
+•      — ﹫  !rank
+•      — ﹫  !top
+•      — ﹫  !ship
+•      — ﹫  !compatibilidad
+•      — ﹫  !crush
+•      — ﹫  !amistad
+•      — ﹫  !love
+•      — ﹫  !abrazo
+•      — ﹫  !beso
+
+❨ ⚽ ❩   𓂂𓂂  𝐅𝖴⵿𝖭 𝐂𝖮⵿𝖬𝖬࠘𝖠𝖭𝖣𝖲 𑊑ㅤׁ🎮ᩨ
+•      — ﹫  !chiste
+•      — ﹫  !frase
+•      — ﹫  !consejo
+•      — ﹫  !meme
+•      — ﹫  !dado
+•      — ﹫  !moneda
+•      — ﹫  !8ball
+•      — ﹫  !fact
+•      — ﹫  !motivacion
+•      — ﹫  !insulto
+
+❨ 🎮 ❩   𓂂𓂂  𝐆𝖱⵿𝖮𝖴𝖯 𝐀𝖣𝖬࠘𝖨𝖭 𑊑ㅤׁ⚽ᩨ
+•      — ﹫  !kick
+•      — ﹫  !add
+•      — ﹫  !promote
+•      — ﹫  !demote
+•      — ﹫  !tagall
+•      — ﹫  !hidetag
+•      — ﹫  !admins
+•      — ﹫  !infogrupo
+•      — ﹫  !antilink
+•      — ﹫  !delete
+
+❨ ⚽ ❩   𓂂𓂂  𝐃𝖮⵿𝖶𝖭𝖫𝖮𝖠࠘𝖣𝖲 𑊑ㅤׁ🎮ᩨ
+•      — ﹫  !play
+•      — ﹫  !video
+•      — ﹫  !audio
+•      — ﹫  !pinterest
+•      — ﹫  !image
+•      — ﹫  !google
+•      — ﹫  !tiktok
+•      — ﹫  !instagram
+•      — ﹫  !facebook
+•      — ﹫  !twitter
+
+❨ 🎮 ❩   𓂂𓂂  𝐓𝖮⵿𝖮𝖫࠘𝖲 𑊑ㅤׁ⚽ᩨ
+•      — ﹫  !translate
+•      — ﹫  !wikipedia
+•      — ﹫  !weather
+•      — ﹫  !define
+•      — ﹫  !calculate
+•      — ﹫  !shorturl
+•      — ﹫  !qr
+•      — ﹫  !readqr
+•      — ﹫  !tts
+•      — ﹫  !dictionary
+
+❨ ⚽ ❩   𓂂𓂂  𝐁𝖮⵿𝖳 𝐒𝖤𝖳⵿𝖳𝖨𝖭࠘𝖦𝖲 𑊑ㅤׁ🎮ᩨ
+•      — ﹫  !setprefix
+•      — ﹫  !welcome
+•      — ﹫  !goodbye
+•      — ﹫  !antilink
+•      — ﹫  !antispam
+•      — ﹫  !autosticker
+•      — ﹫  !autoread
+•      — ﹫  !mode
+•      — ﹫  !enable
+•      — ﹫  !disable
+
+ㅤㅤㅤㅤ  𓂂𓂂 𝐍𝐀𝐆𝐈 𝐒𝐄𝐈𝐒𝐇𝐈𝐑𝐎
+ㅤㅤㅤㅤㅤㅤ  𖹭 𝐁𝐎𝐓 𖹭`;
 }
 
 const frases = [
