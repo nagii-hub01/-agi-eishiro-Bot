@@ -292,7 +292,7 @@ async function conectar(numero, res = null) {
 
       for (const msg of messages) {
         try {
-          if (!msg.message || msg.key.fromMe) continue;
+          if (!msg.message) continue;
 
           const chat = msg.key.remoteJid;
 
